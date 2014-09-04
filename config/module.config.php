@@ -3,7 +3,8 @@ return [
     'service_manager'    => [
         'abstract_factories' => [
             'ModuleLog\Service\LogAbstractServiceFactory',
-            'ModuleLog\Writer\StreamWriterServiceFactory'
-        ],
+            'ModuleLog\Writer\StreamAbstractServiceFactory',
+            'ModuleLog\Writer\PhpFireAbstractServiceFactory'
+        ]
     ]
 ];

@@ -1,11 +1,12 @@
 <?php
 namespace ModuleLog\Writer;
 
-use Zend\Log\Writer\Stream;
+use Zend\Log\Writer\FirePhp\FirePhpBridge;
+use Zend\Log\Writer\FirePhp;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class StreamWriterServiceFactory implements AbstractFactoryInterface
+class PhpFireAbstractServiceFactory implements AbstractFactoryInterface
 {
     /**
      * Config
@@ -17,7 +18,7 @@ class StreamWriterServiceFactory implements AbstractFactoryInterface
      * Config Key
      * @var string
      */
-    protected $configKey = 'logStreamFactory';
+    protected $configKey = 'logPhpFireFactory';
     /**
      * Determine if we can create a service with name
      *
@@ -39,9 +40,6 @@ class StreamWriterServiceFactory implements AbstractFactoryInterface
 
         return (
             isset($config[$requestedName])
-            && is_array($config[$requestedName])
-            && !empty($config[$requestedName])
-            && isset($config[$requestedName]['stream'])
         );
     }
 
@@ -57,7 +55,7 @@ class StreamWriterServiceFactory implements AbstractFactoryInterface
     {
         $config = $this->getConfig($serviceLocator)[$requestedName];
 
-        $configWriter['stream'] = $config['stream'];
+        $configWriter['instance'] = new FirePhpBridge(\FirePHP::getInstance(true));
         // Mode settings
         if(isset($config['mode'])) {
             $configWriter['mode'] = $config['mode'];
@@ -66,17 +64,16 @@ class StreamWriterServiceFactory implements AbstractFactoryInterface
         if(isset($config['log_separator'])) {
             $configWriter['log_separator'] = $config['log_separator'];
         }
-
+        // Filters settings
         if(isset($config['filters'])) {
             $configWriter['filters'] = $config['filters'];
         }
-
+        // Formatter separator settings
         if(isset($config['formatter'])) {
             $configWriter['formatter'] = $config['formatter'];
         }
 
-        $writer = new Stream($configWriter);
-
+        $writer = new FirePHP($configWriter);
         return $writer;
     }
 
